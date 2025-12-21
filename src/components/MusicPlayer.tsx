@@ -5,6 +5,21 @@ import { Volume2, VolumeX, Music } from 'lucide-react';
 // Royalty-free ambient winter music
 const AMBIENT_MUSIC_URL = 'https://cdn.pixabay.com/audio/2024/11/29/audio_cf29d4efb8.mp3';
 
+// Lock sound effect
+const LOCK_SOUND_URL = 'https://cdn.pixabay.com/audio/2022/03/10/audio_c8c8a73467.mp3';
+
+// Global audio for lock sound
+let lockAudio: HTMLAudioElement | null = null;
+
+export const playLockSound = () => {
+  if (!lockAudio) {
+    lockAudio = new Audio(LOCK_SOUND_URL);
+    lockAudio.volume = 0.5;
+  }
+  lockAudio.currentTime = 0;
+  lockAudio.play().catch(() => {});
+};
+
 export const MusicPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -13,13 +28,16 @@ export const MusicPlayer = () => {
 
   useEffect(() => {
     // Create audio element
-    audioRef.current = new Audio(AMBIENT_MUSIC_URL);
-    audioRef.current.loop = true;
-    audioRef.current.volume = 0.3;
+    const audio = new Audio(AMBIENT_MUSIC_URL);
+    audio.loop = true;
+    audio.volume = 0.3;
+    audioRef.current = audio;
     
-    audioRef.current.addEventListener('canplaythrough', () => {
+    const handleCanPlay = () => {
       setIsLoaded(true);
-    });
+    };
+
+    audio.addEventListener('canplaythrough', handleCanPlay);
 
     // Hide tooltip after 5 seconds
     const tooltipTimer = setTimeout(() => {
@@ -28,32 +46,33 @@ export const MusicPlayer = () => {
 
     return () => {
       clearTimeout(tooltipTimer);
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
+      audio.removeEventListener('canplaythrough', handleCanPlay);
+      audio.pause();
+      audio.src = '';
+      audioRef.current = null;
     };
   }, []);
 
-  const toggleMusic = async () => {
-    if (!audioRef.current) return;
+  const toggleMusic = () => {
+    if (!audioRef.current || !isLoaded) return;
 
-    try {
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        await audioRef.current.play();
-        setIsPlaying(true);
-        setShowTooltip(false);
-      }
-    } catch (error) {
-      console.log('Audio playback failed:', error);
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play()
+        .then(() => {
+          setIsPlaying(true);
+          setShowTooltip(false);
+        })
+        .catch((error) => {
+          console.log('Audio playback failed:', error);
+        });
     }
   };
 
   return (
-    <div className="fixed top-4 right-4 z-50">
+    <div className="fixed top-4 right-4 z-[9999]" style={{ pointerEvents: 'auto' }}>
       <div className="relative">
         {/* Tooltip */}
         <AnimatePresence>
@@ -74,18 +93,18 @@ export const MusicPlayer = () => {
 
         {/* Music Button */}
         <motion.button
+          type="button"
           onClick={toggleMusic}
-          disabled={!isLoaded}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className={`
             relative w-12 h-12 rounded-full flex items-center justify-center
-            transition-all duration-300 shadow-lg
+            transition-all duration-300 shadow-lg cursor-pointer
             ${isPlaying 
               ? 'bg-primary text-primary-foreground' 
               : 'glass-card text-foreground hover:bg-card/90'
             }
-            ${!isLoaded ? 'opacity-50 cursor-wait' : 'cursor-pointer'}
+            ${!isLoaded ? 'opacity-50' : ''}
           `}
           aria-label={isPlaying ? 'Mute music' : 'Play music'}
         >

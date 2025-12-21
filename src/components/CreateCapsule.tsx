@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Lock, Calendar, Sparkles, Check } from 'lucide-react';
+import { ArrowLeft, Lock, Calendar, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { playLockSound } from './MusicPlayer';
 
 interface CreateCapsuleProps {
   onBack: () => void;
@@ -30,6 +31,9 @@ export const CreateCapsule = ({ onBack, onComplete }: CreateCapsuleProps) => {
     if (!title || !message || !unlockDate) return;
     
     setIsSealing(true);
+    
+    // Play lock sound
+    playLockSound();
     
     // Simulate sealing animation
     await new Promise(resolve => setTimeout(resolve, 1500));
