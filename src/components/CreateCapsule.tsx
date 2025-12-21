@@ -100,7 +100,7 @@ export const CreateCapsule = ({ onBack, onComplete }: CreateCapsuleProps) => {
 
               <Input
                 type="text"
-                placeholder="My 2025 Goals..."
+                placeholder={`My ${new Date().getFullYear()} Goals...`}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="h-14 text-lg bg-secondary/30 border-secondary focus:border-primary/50"
