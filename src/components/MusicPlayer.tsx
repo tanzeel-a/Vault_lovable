@@ -1,0 +1,136 @@
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Volume2, VolumeX, Music } from 'lucide-react';
+
+// Royalty-free ambient winter music
+const AMBIENT_MUSIC_URL = 'https://cdn.pixabay.com/audio/2024/11/29/audio_cf29d4efb8.mp3';
+
+export const MusicPlayer = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(true);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    // Create audio element
+    audioRef.current = new Audio(AMBIENT_MUSIC_URL);
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.3;
+    
+    audioRef.current.addEventListener('canplaythrough', () => {
+      setIsLoaded(true);
+    });
+
+    // Hide tooltip after 5 seconds
+    const tooltipTimer = setTimeout(() => {
+      setShowTooltip(false);
+    }, 5000);
+
+    return () => {
+      clearTimeout(tooltipTimer);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const toggleMusic = async () => {
+    if (!audioRef.current) return;
+
+    try {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        await audioRef.current.play();
+        setIsPlaying(true);
+        setShowTooltip(false);
+      }
+    } catch (error) {
+      console.log('Audio playback failed:', error);
+    }
+  };
+
+  return (
+    <div className="fixed top-4 right-4 z-50">
+      <div className="relative">
+        {/* Tooltip */}
+        <AnimatePresence>
+          {showTooltip && isLoaded && (
+            <motion.div
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              className="absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap"
+            >
+              <div className="glass-card px-4 py-2 text-sm text-foreground flex items-center gap-2">
+                <Music className="w-4 h-4 text-accent" />
+                <span>Play ambient music</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Music Button */}
+        <motion.button
+          onClick={toggleMusic}
+          disabled={!isLoaded}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className={`
+            relative w-12 h-12 rounded-full flex items-center justify-center
+            transition-all duration-300 shadow-lg
+            ${isPlaying 
+              ? 'bg-primary text-primary-foreground' 
+              : 'glass-card text-foreground hover:bg-card/90'
+            }
+            ${!isLoaded ? 'opacity-50 cursor-wait' : 'cursor-pointer'}
+          `}
+          aria-label={isPlaying ? 'Mute music' : 'Play music'}
+        >
+          {isPlaying ? (
+            <Volume2 className="w-5 h-5" />
+          ) : (
+            <VolumeX className="w-5 h-5" />
+          )}
+
+          {/* Playing indicator */}
+          {isPlaying && (
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 border-primary-foreground/30"
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          )}
+        </motion.button>
+
+        {/* Sound wave animation when playing */}
+        <AnimatePresence>
+          {isPlaying && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-end gap-0.5"
+            >
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  className="w-1 bg-accent rounded-full"
+                  animate={{ height: ['4px', '12px', '4px'] }}
+                  transition={{
+                    duration: 0.6,
+                    repeat: Infinity,
+                    delay: i * 0.15,
+                    ease: 'easeInOut',
+                  }}
+                />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};

@@ -5,6 +5,7 @@ import { LandingHero } from '@/components/LandingHero';
 import { CreateCapsule, Capsule } from '@/components/CreateCapsule';
 import { Vault } from '@/components/Vault';
 import { SealedSuccess } from '@/components/SealedSuccess';
+import { MusicPlayer } from '@/components/MusicPlayer';
 
 type View = 'landing' | 'create' | 'vault' | 'success';
 
@@ -42,6 +43,9 @@ const Index = () => {
 
       {/* Snowfall Effect */}
       <Snowfall />
+
+      {/* Music Player */}
+      <MusicPlayer />
 
       {/* Main Content */}
       <main className="relative z-20">
