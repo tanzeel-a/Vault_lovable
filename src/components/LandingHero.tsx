@@ -76,15 +76,15 @@ export const LandingHero = ({ onStart }: LandingHeroProps) => {
           </Button>
         </motion.div>
 
-        {/* Year badge */}
+        {/* Catchy badge */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.8 }}
           className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-accent/30 bg-accent/10"
         >
-          <span className="text-accent font-semibold">✨ 2025</span>
-          <span className="text-muted-foreground text-sm">New Year Edition</span>
+          <span className="text-accent font-semibold">✨ no cap</span>
+          <span className="text-muted-foreground text-sm">future you will thank you</span>
         </motion.div>
       </motion.div>
     </div>
