@@ -8,7 +8,6 @@ const AMBIENT_MUSIC_URL = 'https://cdn.pixabay.com/audio/2024/11/29/audio_cf29d4
 
 export const MusicPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -17,16 +16,13 @@ export const MusicPlayer = () => {
     preloadSounds();
     
     // Create audio element
-    const audio = new Audio(AMBIENT_MUSIC_URL);
+    const audio = new Audio();
     audio.loop = true;
     audio.volume = 0.3;
+    audio.preload = 'auto';
+    audio.crossOrigin = 'anonymous';
+    audio.src = AMBIENT_MUSIC_URL;
     audioRef.current = audio;
-    
-    const handleCanPlay = () => {
-      setIsLoaded(true);
-    };
-
-    audio.addEventListener('canplaythrough', handleCanPlay);
 
     // Hide tooltip after 5 seconds
     const tooltipTimer = setTimeout(() => {
@@ -35,7 +31,6 @@ export const MusicPlayer = () => {
 
     return () => {
       clearTimeout(tooltipTimer);
-      audio.removeEventListener('canplaythrough', handleCanPlay);
       audio.pause();
       audio.src = '';
       audioRef.current = null;
@@ -45,12 +40,14 @@ export const MusicPlayer = () => {
   const toggleMusic = () => {
     playClickSound();
     
-    if (!audioRef.current || !isLoaded) return;
+    if (!audioRef.current) return;
 
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
+      // Force load and play
+      audioRef.current.load();
       audioRef.current.play()
         .then(() => {
           setIsPlaying(true);
@@ -67,7 +64,7 @@ export const MusicPlayer = () => {
       <div className="relative">
         {/* Tooltip */}
         <AnimatePresence>
-          {showTooltip && isLoaded && (
+          {showTooltip && (
             <motion.div
               initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
@@ -95,7 +92,6 @@ export const MusicPlayer = () => {
               ? 'bg-primary text-primary-foreground' 
               : 'glass-card text-foreground hover:bg-card/90'
             }
-            ${!isLoaded ? 'opacity-50' : ''}
           `}
           aria-label={isPlaying ? 'Mute music' : 'Play music'}
         >
