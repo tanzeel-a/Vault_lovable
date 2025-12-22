@@ -1,23 +1,57 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import snowBackground from '@/assets/snow-background.jpg';
 import { Snowfall } from '@/components/Snowfall';
 import { LandingHero } from '@/components/LandingHero';
 import { CreateCapsule, Capsule } from '@/components/CreateCapsule';
 import { Vault } from '@/components/Vault';
 import { SealedSuccess } from '@/components/SealedSuccess';
-import { MusicPlayer } from '@/components/MusicPlayer';
+import { preloadSounds } from '@/lib/sounds';
+
+const AMBIENT_MUSIC_URL = 'https://cdn.pixabay.com/audio/2024/11/29/audio_cf29d4efb8.mp3';
 
 type View = 'landing' | 'create' | 'vault' | 'success';
 
 const Index = () => {
   const [view, setView] = useState<View>('landing');
   const [sealedCapsule, setSealedCapsule] = useState<Capsule | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const hasInteracted = useRef(false);
 
   useEffect(() => {
     const hasCapsules = JSON.parse(localStorage.getItem('capsules') || '[]').length > 0;
     if (hasCapsules) {
       setView('vault');
     }
+    
+    // Preload sounds
+    preloadSounds();
+    
+    // Setup background music
+    const audio = new Audio();
+    audio.loop = true;
+    audio.volume = 0.2;
+    audio.src = AMBIENT_MUSIC_URL;
+    audioRef.current = audio;
+
+    // Play on first user interaction (required by browsers)
+    const startMusic = () => {
+      if (!hasInteracted.current && audioRef.current) {
+        hasInteracted.current = true;
+        audioRef.current.play().catch(() => {});
+      }
+    };
+
+    document.addEventListener('click', startMusic);
+    document.addEventListener('keydown', startMusic);
+
+    return () => {
+      document.removeEventListener('click', startMusic);
+      document.removeEventListener('keydown', startMusic);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+    };
   }, []);
 
   const handleCapsuleComplete = (capsule: Capsule) => {
@@ -43,9 +77,6 @@ const Index = () => {
 
       {/* Snowfall Effect */}
       <Snowfall />
-
-      {/* Music Player */}
-      <MusicPlayer />
 
       {/* Main Content */}
       <main className="relative z-20">
