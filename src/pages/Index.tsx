@@ -7,7 +7,7 @@ import { Vault } from '@/components/Vault';
 import { SealedSuccess } from '@/components/SealedSuccess';
 import { preloadSounds } from '@/lib/sounds';
 
-const AMBIENT_MUSIC_URL = 'https://cdn.pixabay.com/audio/2024/11/29/audio_cf29d4efb8.mp3';
+const AMBIENT_MUSIC_URL = '/audio/happynewyear.mp3';
 
 type View = 'landing' | 'create' | 'vault' | 'success';
 
