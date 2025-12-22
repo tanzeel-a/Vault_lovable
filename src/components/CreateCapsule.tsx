@@ -4,7 +4,7 @@ import { ArrowLeft, Lock, Calendar, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { playLockSound } from './MusicPlayer';
+import { playLockSound, playClickSound } from '@/lib/sounds';
 
 interface CreateCapsuleProps {
   onBack: () => void;
@@ -66,7 +66,7 @@ export const CreateCapsule = ({ onBack, onComplete }: CreateCapsuleProps) => {
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <Button variant="ghost" size="sm" onClick={onBack}>
+          <Button variant="ghost" size="sm" onClick={() => { playClickSound(); onBack(); }}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
@@ -114,7 +114,7 @@ export const CreateCapsule = ({ onBack, onComplete }: CreateCapsuleProps) => {
                 variant="hero"
                 size="lg"
                 className="w-full"
-                onClick={() => setStep(2)}
+                onClick={() => { playClickSound(); setStep(2); }}
                 disabled={!title.trim()}
               >
                 Continue
@@ -147,14 +147,14 @@ export const CreateCapsule = ({ onBack, onComplete }: CreateCapsuleProps) => {
               />
 
               <div className="flex gap-3">
-                <Button variant="outline" size="lg" onClick={() => setStep(1)}>
+                <Button variant="outline" size="lg" onClick={() => { playClickSound(); setStep(1); }}>
                   Back
                 </Button>
                 <Button
                   variant="hero"
                   size="lg"
                   className="flex-1"
-                  onClick={() => setStep(3)}
+                  onClick={() => { playClickSound(); setStep(3); }}
                   disabled={!message.trim()}
                 >
                   Continue
@@ -192,7 +192,7 @@ export const CreateCapsule = ({ onBack, onComplete }: CreateCapsuleProps) => {
               </div>
 
               <div className="flex gap-3">
-                <Button variant="outline" size="lg" onClick={() => setStep(2)}>
+                <Button variant="outline" size="lg" onClick={() => { playClickSound(); setStep(2); }}>
                   Back
                 </Button>
                 <Button

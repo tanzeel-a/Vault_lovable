@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Lock, Unlock, Calendar, Trash2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Capsule } from './CreateCapsule';
+import { playClickSound } from '@/lib/sounds';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -83,7 +84,7 @@ export const Vault = ({ onCreateNew }: VaultProps) => {
             <p className="text-muted-foreground mb-6">
               Create your first time capsule to get started
             </p>
-            <Button variant="hero" size="lg" onClick={onCreateNew}>
+            <Button variant="hero" size="lg" onClick={() => { playClickSound(); onCreateNew(); }}>
               <Plus className="w-5 h-5 mr-2" />
               Create Capsule
             </Button>
@@ -161,7 +162,7 @@ export const Vault = ({ onCreateNew }: VaultProps) => {
               transition={{ delay: 0.3 }}
               className="text-center"
             >
-              <Button variant="outline" size="lg" onClick={onCreateNew}>
+              <Button variant="outline" size="lg" onClick={() => { playClickSound(); onCreateNew(); }}>
                 <Plus className="w-5 h-5 mr-2" />
                 Create Another Capsule
               </Button>
