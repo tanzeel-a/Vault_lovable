@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Sparkles, Lock, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { playClickSound } from '@/lib/sounds';
 
 interface LandingHeroProps {
   onStart: () => void;
@@ -68,7 +69,7 @@ export const LandingHero = ({ onStart }: LandingHeroProps) => {
           <Button 
             variant="hero" 
             size="xl" 
-            onClick={onStart}
+            onClick={() => { playClickSound(); onStart(); }}
             className="group"
           >
             <span>Create Your Capsule</span>

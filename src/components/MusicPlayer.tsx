@@ -1,24 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2, VolumeX, Music } from 'lucide-react';
+import { playClickSound, preloadSounds } from '@/lib/sounds';
 
 // Royalty-free ambient winter music
 const AMBIENT_MUSIC_URL = 'https://cdn.pixabay.com/audio/2024/11/29/audio_cf29d4efb8.mp3';
-
-// Lock sound effect
-const LOCK_SOUND_URL = 'https://cdn.pixabay.com/audio/2022/03/10/audio_c8c8a73467.mp3';
-
-// Global audio for lock sound
-let lockAudio: HTMLAudioElement | null = null;
-
-export const playLockSound = () => {
-  if (!lockAudio) {
-    lockAudio = new Audio(LOCK_SOUND_URL);
-    lockAudio.volume = 0.5;
-  }
-  lockAudio.currentTime = 0;
-  lockAudio.play().catch(() => {});
-};
 
 export const MusicPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -27,6 +13,9 @@ export const MusicPlayer = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
+    // Preload all sounds on mount
+    preloadSounds();
+    
     // Create audio element
     const audio = new Audio(AMBIENT_MUSIC_URL);
     audio.loop = true;
@@ -54,6 +43,8 @@ export const MusicPlayer = () => {
   }, []);
 
   const toggleMusic = () => {
+    playClickSound();
+    
     if (!audioRef.current || !isLoaded) return;
 
     if (isPlaying) {

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Check, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Capsule } from './CreateCapsule';
+import { playClickSound, playSuccessSound } from '@/lib/sounds';
 
 interface SealedSuccessProps {
   capsule: Capsule;
@@ -10,6 +11,9 @@ interface SealedSuccessProps {
 }
 
 export const SealedSuccess = ({ capsule, onViewVault, onCreateAnother }: SealedSuccessProps) => {
+  // Play success sound on mount
+  playSuccessSound();
+  
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -86,7 +90,7 @@ export const SealedSuccess = ({ capsule, onViewVault, onCreateAnother }: SealedS
             variant="outline"
             size="lg"
             className="flex-1"
-            onClick={onCreateAnother}
+            onClick={() => { playClickSound(); onCreateAnother(); }}
           >
             Create Another
           </Button>
@@ -94,7 +98,7 @@ export const SealedSuccess = ({ capsule, onViewVault, onCreateAnother }: SealedS
             variant="hero"
             size="lg"
             className="flex-1"
-            onClick={onViewVault}
+            onClick={() => { playClickSound(); onViewVault(); }}
           >
             View Vault
             <ArrowRight className="w-4 h-4 ml-2" />
