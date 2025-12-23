@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { playLockSound, playClickSound } from '@/lib/sounds';
+import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
 
 interface CreateCapsuleProps {
   onBack: () => void;
@@ -29,15 +31,17 @@ export const CreateCapsule = ({ onBack, onComplete }: CreateCapsuleProps) => {
 
   const handleSeal = async () => {
     if (!title || !message || !unlockDate) return;
-    
+
     setIsSealing(true);
-    
+
     // Play lock sound
     playLockSound();
-    
+
     // Simulate sealing animation
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
+    const userEmail = localStorage.getItem('user_email');
+
     const capsule: Capsule = {
       id: Date.now().toString(),
       title,
@@ -46,11 +50,31 @@ export const CreateCapsule = ({ onBack, onComplete }: CreateCapsuleProps) => {
       createdAt: new Date().toISOString(),
       isSealed: true,
     };
-    
-    // Save to localStorage
+
+    // Try to save to Supabase
+    if (!supabase) {
+      toast.error('Supabase client is not initialized!');
+    } else if (!userEmail) {
+      toast.error('User email not found in localStorage!');
+    } else {
+      const { error } = await supabase.from('capsules').insert({
+        user_email: userEmail,
+        title,
+        message,
+        unlock_date: unlockDate,
+      });
+
+      if (error) {
+        toast.error(`Supabase error: ${error.message}`);
+      } else {
+        toast.success('Capsule saved to your vault!');
+      }
+    }
+
+    // Always save to localStorage as fallback
     const existing = JSON.parse(localStorage.getItem('capsules') || '[]');
     localStorage.setItem('capsules', JSON.stringify([...existing, capsule]));
-    
+
     onComplete(capsule);
   };
 
@@ -70,15 +94,14 @@ export const CreateCapsule = ({ onBack, onComplete }: CreateCapsuleProps) => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
-          
+
           {/* Progress indicator */}
           <div className="flex gap-2">
             {[1, 2, 3].map((s) => (
               <div
                 key={s}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  s <= step ? 'bg-primary w-6' : 'bg-muted'
-                }`}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${s <= step ? 'bg-primary w-6' : 'bg-muted'
+                  }`}
               />
             ))}
           </div>
@@ -104,7 +127,7 @@ export const CreateCapsule = ({ onBack, onComplete }: CreateCapsuleProps) => {
 
               <Input
                 type="text"
-                placeholder={`My ${new Date().getFullYear()} Goals...`}
+                placeholder="vibes only ✨"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="h-14 text-lg bg-secondary/30 border-secondary focus:border-primary/50"

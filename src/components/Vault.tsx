@@ -4,6 +4,7 @@ import { Plus, Lock, Unlock, Calendar, Trash2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Capsule } from './CreateCapsule';
 import { playClickSound } from '@/lib/sounds';
+import { supabase } from '@/lib/supabase';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,10 +24,42 @@ export const Vault = ({ onCreateNew }: VaultProps) => {
   const [capsules, setCapsules] = useState<Capsule[]>([]);
   const [selectedCapsule, setSelectedCapsule] = useState<Capsule | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('capsules') || '[]');
-    setCapsules(stored);
+    const fetchCapsules = async () => {
+      const userEmail = localStorage.getItem('user_email');
+
+      // Try Supabase first
+      if (supabase && userEmail) {
+        const { data, error } = await supabase
+          .from('capsules')
+          .select('*')
+          .eq('user_email', userEmail)
+          .order('created_at', { ascending: false });
+
+        if (!error && data) {
+          const mapped = data.map((c: any) => ({
+            id: c.id,
+            title: c.title,
+            message: c.message,
+            unlockDate: c.unlock_date,
+            createdAt: c.created_at,
+            isSealed: !c.is_opened,
+          }));
+          setCapsules(mapped);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Fallback to localStorage
+      const stored = JSON.parse(localStorage.getItem('capsules') || '[]');
+      setCapsules(stored);
+      setLoading(false);
+    };
+
+    fetchCapsules();
   }, []);
 
   const canUnlock = (unlockDate: string) => {
@@ -46,11 +79,47 @@ export const Vault = ({ onCreateNew }: VaultProps) => {
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
+    // Delete from Supabase
+    if (supabase) {
+      const { error } = await supabase.from('capsules').delete().eq('id', id);
+      if (error) {
+        // We might want to show a toast here, but for now we'll proceed to delete locally too
+      }
+    }
+
     const updated = capsules.filter((c) => c.id !== id);
     setCapsules(updated);
     localStorage.setItem('capsules', JSON.stringify(updated));
     setDeleteId(null);
+  };
+
+  const handleOpenCapsule = async (capsule: Capsule) => {
+    if (!capsule.isSealed) {
+      setSelectedCapsule(capsule);
+      return;
+    }
+
+    // Update Supabase
+    if (supabase) {
+      const { error } = await supabase
+        .from('capsules')
+        .update({ is_opened: true })
+        .eq('id', capsule.id);
+
+      if (error) {
+        // Silently fail for now
+      }
+    }
+
+    // Update local state
+    const updatedCapsules = capsules.map(c =>
+      c.id === capsule.id ? { ...c, isSealed: false } : c
+    );
+    setCapsules(updatedCapsules);
+    localStorage.setItem('capsules', JSON.stringify(updatedCapsules));
+
+    setSelectedCapsule({ ...capsule, isSealed: false });
   };
 
   return (
@@ -104,10 +173,9 @@ export const Vault = ({ onCreateNew }: VaultProps) => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.9 }}
                       transition={{ delay: index * 0.1 }}
-                      className={`glass-card p-6 cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
-                        unlockable ? 'border-accent/50 hover:border-accent' : ''
-                      }`}
-                      onClick={() => unlockable && setSelectedCapsule(capsule)}
+                      className={`glass-card p-6 cursor-pointer transition-all duration-300 hover:scale-[1.02] ${unlockable ? 'border-accent/50 hover:border-accent' : ''
+                        }`}
+                      onClick={() => unlockable && handleOpenCapsule(capsule)}
                     >
                       <div className="flex items-start justify-between mb-4">
                         <div className={`p-3 rounded-xl ${unlockable ? 'bg-accent/20' : 'bg-secondary'}`}>

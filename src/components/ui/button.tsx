@@ -17,9 +17,9 @@ const buttonVariants = cva(
           "border-2 border-primary/30 bg-transparent text-foreground hover:bg-primary/10 hover:border-primary/50",
         secondary:
           "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: 
+        ghost:
           "hover:bg-accent/20 hover:text-accent-foreground",
-        link: 
+        link:
           "text-primary underline-offset-4 hover:underline",
         hero:
           "bg-primary text-primary-foreground font-semibold shadow-xl hover:shadow-2xl hover:scale-[1.03] active:scale-[0.98]",
@@ -29,11 +29,11 @@ const buttonVariants = cva(
           "bg-card/60 backdrop-blur-md border border-white/40 text-foreground shadow-lg hover:bg-card/80 hover:scale-[1.02]",
       },
       size: {
-        default: "h-11 px-6 py-2",
-        sm: "h-9 rounded-lg px-4 text-xs",
-        lg: "h-14 rounded-xl px-10 text-base",
-        xl: "h-16 rounded-2xl px-12 text-lg",
-        icon: "h-10 w-10",
+        default: "h-10 px-5 py-2 md:h-11 md:px-6",
+        sm: "h-8 rounded-lg px-3 text-xs md:h-9 md:px-4",
+        lg: "h-12 rounded-xl px-6 text-sm md:h-14 md:px-10 md:text-base",
+        xl: "h-14 rounded-2xl px-8 text-base md:h-16 md:px-12 md:text-lg",
+        icon: "h-9 w-9 md:h-10 md:w-10",
       },
     },
     defaultVariants: {
@@ -45,7 +45,7 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 

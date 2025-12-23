@@ -1,0 +1,216 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Rock+Salt&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        /* Warm Winter Palette */
+        --background: 40 33% 96%;
+        --foreground: 20 15% 15%;
+
+        --card: 40 40% 98%;
+        --card-foreground: 20 15% 15%;
+
+        --popover: 40 40% 98%;
+        --popover-foreground: 20 15% 15%;
+
+        --primary: 0 75% 45%;
+        --primary-foreground: 40 33% 98%;
+
+        --secondary: 35 30% 90%;
+        --secondary-foreground: 20 15% 25%;
+
+        --muted: 35 20% 92%;
+        --muted-foreground: 20 10% 45%;
+
+        --accent: 43 96% 56%;
+        --accent-foreground: 20 15% 15%;
+
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+
+        --border: 35 25% 88%;
+        --input: 35 25% 88%;
+        --ring: 0 75% 45%;
+
+        --radius: 1rem;
+
+        /* Custom design tokens */
+        --color-gold: 43 96% 56%;
+        --color-cream: 40 33% 96%;
+        --color-snow: 40 40% 98%;
+        --color-crimson: 0 75% 45%;
+        --color-crimson-dark: 0 75% 35%;
+
+        /* Glassmorphism */
+        --glass-bg: 40 40% 98% / 0.85;
+        --glass-border: 40 40% 100% / 0.5;
+        --glass-shadow: 0 8px 32px rgba(139, 69, 69, 0.12);
+
+        /* Typography */
+        --font-display: 'Rock Salt', cursive;
+        --font-body: 'Inter', sans-serif;
+
+        /* Animations */
+        --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dark {
+        --background: 20 20% 8%;
+        --foreground: 40 33% 96%;
+
+        --card: 20 20% 12%;
+        --card-foreground: 40 33% 96%;
+
+        --popover: 20 20% 12%;
+        --popover-foreground: 40 33% 96%;
+
+        --primary: 0 70% 55%;
+        --primary-foreground: 40 33% 98%;
+
+        --secondary: 20 15% 18%;
+        --secondary-foreground: 40 33% 90%;
+
+        --muted: 20 15% 20%;
+        --muted-foreground: 35 15% 60%;
+
+        --accent: 43 90% 50%;
+        --accent-foreground: 20 15% 10%;
+
+        --border: 20 15% 22%;
+        --input: 20 15% 22%;
+        --ring: 0 70% 55%;
+
+        --glass-bg: 20 20% 12% / 0.85;
+        --glass-border: 20 20% 25% / 0.5;
+        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-background text-foreground antialiased;
+        font-family: var(--font-body);
+    }
+
+    h1,
+    h2,
+    h3 {
+        font-family: var(--font-display);
+    }
+}
+
+@layer components {
+    .glass-card {
+        @apply bg-card/85 backdrop-blur-xl border border-white/50 rounded-2xl;
+        box-shadow: var(--glass-shadow);
+    }
+
+    .glass-card-strong {
+        @apply bg-card/95 backdrop-blur-2xl border border-white/60 rounded-2xl;
+        box-shadow: 0 12px 48px rgba(139, 69, 69, 0.15);
+    }
+
+    .text-display {
+        font-family: var(--font-display);
+    }
+
+    .text-gradient {
+        @apply bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent;
+        background-size: 200% auto;
+    }
+
+    .glow-accent {
+        box-shadow: 0 0 30px hsl(var(--accent) / 0.4), 0 0 60px hsl(var(--accent) / 0.2);
+    }
+
+    .glow-primary {
+        box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+    }
+}
+
+@layer utilities {
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .animate-shimmer {
+        animation: shimmer 3s ease-in-out infinite;
+    }
+
+    .animate-pulse-soft {
+        animation: pulse-soft 3s ease-in-out infinite;
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes shimmer {
+
+    0%,
+    100% {
+        opacity: 0.7;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes pulse-soft {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.02);
+        opacity: 0.9;
+    }
+}
+
+@keyframes snow-fall {
+    0% {
+        transform: translateY(-10vh) translateX(0);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100vh) translateX(20px);
+        opacity: 0;
+    }
+}
+
+.snowflake {
+    animation: snow-fall linear infinite;
+}
