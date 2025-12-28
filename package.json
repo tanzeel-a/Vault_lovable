@@ -10,6 +10,10 @@
     "lint": "next lint",
     "postinstall": "rm -rf \"node_modules/@types/phoenix 2\" \"node_modules/@types/ws 2\" || true"
   },
+  "overrides": {
+    "react": "$react",
+    "react-dom": "$react-dom"
+  },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.11",
