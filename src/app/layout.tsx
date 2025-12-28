@@ -3,8 +3,8 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-    title: "Lovable UI Refresh",
-    description: "Created with Lovable",
+    title: "Time Capsule",
+    description: "Store your memories securely",
 };
 
 export default function RootLayout({
